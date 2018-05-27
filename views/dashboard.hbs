@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/dist/jquery-clockpicker.min.css">
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.2.0/css/fabric.min.css">
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.2.0/css/fabric.components.min.css">
+    <script src="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.2.0/js/fabric.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="/dist/pickadate.js/lib/compressed/picker.js"></script>
+    <script src="/dist/pickadate.js/lib/compressed/picker.date.js"></script>
+    <script src="/dist/jquery-clockpicker.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <div class="ms-MessageBanner">
+        <div class="ms-MessageBanner-content">
+            <div class="ms-CommandButton ms-CommandButton--inline" style="display: flex; justify-content: space-between">
+                <button class="ms-Button ms-Button--hero dialogSignInButton">
+                    <span class="ms-Button-icon">
+                        <i class="ms-Icon ms-Icon--Add"></i>
+                    </span>
+                    <span class="ms-Button-label">Add a new weight</span>
+                </button>
+                <button class="ms-Button ms-Button--hero dialogLogInButton">
+                    <span class="ms-Button-icon">
+                        <i class="ms-Icon ms-Icon--Add"></i>
+                    </span>
+                    <span class="ms-Button-label">Add a new activity</span>
+                </button>
+                <form method="post" action="/signout">
+                    <button class="ms-Button ms-Button--compound ms-Button--primary">
+                        <span class="ms-Button-label">Sign out</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="ms-PeoplePicker">
+        <div class="ms-PeoplePicker-searchBox">
+            <div class="ms-TextField ms-TextField--textFieldUnderlined">
+                <input class="ms-TextField-field" type="text" value="" placeholder="Click to display all the users">
+            </div>
+        </div>
+        <div class="ms-PeoplePicker-results">
+            <div class="ms-PeoplePicker-resultGroup">
+                <div class="ms-PeoplePicker-resultGroupTitle">
+                    Users
+                </div>
+                {{#each accs}}
+                <a href="/dashboard?people={{username}}">
+                    <div class="ms-PeoplePicker-result" tabindex="1">
+                        <div class="ms-Persona ms-Persona--sm">
+                            <div class="ms-Persona-imageArea">
+                                <div class="ms-Persona-initials ms-Persona-initials--black">{{username.[0]}}</div>
+                            </div>
+                            <div class="ms-Persona-presence">
+                            </div>
+                            <div class="ms-Persona-details">
+                                <div class="ms-Persona-primaryText">{{username}}</div>
+                                <div class="ms-Persona-secondaryText">{{city}}</div>
+                            </div>
+                        </div>
+                        <button class="ms-PeoplePicker-resultAction">
+                            <i class="ms-Icon ms-Icon--Clear"></i>
+                        </button>
+                    </div>
+                </a>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: space-around">
+        <div id="myWeights" style="border: 1px solid black"></div>
+        <div id="myActivities" style="border: 1px solid black"></div>
+    </div>
+    <div class="docs-DialogExample-lgHeader dialogSignIn">
+        <div class="docs-DialogExample-lgHeader dialogLogIn">
+            <div class="ms-Dialog ms-Dialog--lgHeader dialogLogInDial">
+                <div class="ms-Dialog-title">Register a new activity to your account</div>
+                <form method="post" action="/dashboard">
+                    <div class="ms-Dialog-content">
+                        <div class="ms-TextField">
+                            <label class="ms-Label">Description</label>
+                            <input class="ms-TextField-field" type="text" name="description" placeholder="Description">
+                        </div>
+                        <div class="ms-TextField">
+                            <div class="ms-DatePicker">
+                                <div class="ms-TextField">
+                                    <label class="ms-Label">Date</label>
+                                    <i class="ms-DatePicker-event ms-Icon ms-Icon--Event"></i>
+                                    <input class="ms-TextField-field" type="text" name="datepick" placeholder="Select a date&hellip;">
+                                </div>
+                                <div class="ms-DatePicker-monthComponents">
+                                    <span class="ms-DatePicker-nextMonth js-nextMonth">
+                                        <i class="ms-Icon ms-Icon--ChevronRight"></i>
+                                    </span>
+                                    <span class="ms-DatePicker-prevMonth js-prevMonth">
+                                        <i class="ms-Icon ms-Icon--ChevronLeft"></i>
+                                    </span>
+                                    <div class="ms-DatePicker-headerToggleView js-showMonthPicker"></div>
+                                </div>
+                                <span class="ms-DatePicker-goToday js-goToday">Go to today</span>
+                                <div class="ms-DatePicker-monthPicker">
+                                    <div class="ms-DatePicker-header">
+                                        <div class="ms-DatePicker-yearComponents">
+                                            <span class="ms-DatePicker-nextYear js-nextYear">
+                                                <i class="ms-Icon ms-Icon--ChevronRight"></i>
+                                            </span>
+                                            <span class="ms-DatePicker-prevYear js-prevYear">
+                                                <i class="ms-Icon ms-Icon--ChevronLeft"></i>
+                                            </span>
+                                        </div>
+                                        <div class="ms-DatePicker-currentYear js-showYearPicker"></div>
+                                    </div>
+                                    <div class="ms-DatePicker-optionGrid">
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="0">Jan</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="1">Feb</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="2">Mar</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="3">Apr</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="4">May</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="5">Jun</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="6">Jul</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="7">Aug</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="8">Sep</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="9">Oct</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="10">Nov</span>
+                                        <span class="ms-DatePicker-monthOption js-changeDate" data-month="11">Dec</span>
+                                    </div>
+                                </div>
+                                <div class="ms-DatePicker-yearPicker">
+                                    <div class="ms-DatePicker-decadeComponents">
+                                        <span class="ms-DatePicker-nextDecade js-nextDecade">
+                                            <i class="ms-Icon ms-Icon--ChevronRight"></i>
+                                        </span>
+                                        <span class="ms-DatePicker-prevDecade js-prevDecade">
+                                            <i class="ms-Icon ms-Icon--ChevronLeft"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group clockpicker">
+                            <label class="ms-Label">Begin time</label>
+                            <input type="text" class="form-control" value="09:30" name="begintime">
+                            <span class="input-group-addon">
+                                <span class="">Validate</span>
+                            </span>
+                        </div>
+                        <div class="input-group clockpicker">
+                            <label class="ms-Label">End time</label>
+                            <input type="text" class="form-control" value="10:00" name="endtime">
+                            <span class="input-group-addon">
+                                <span class="">Validate</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="ms-Dialog-actions">
+                        <button class="ms-Button ms-Dialog-action ms-Button--primary" type="submit">
+                            <span class="ms-Button-label">Register</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <label class="docs-DialogExample-label"></label>
+        </div>
+        <div class="ms-Dialog ms-Dialog--lgHeader dialogSignInDial">
+            <div class="ms-Dialog-title">Register a new weight in your account</div>
+            <form method="post" action="/dashboard">
+                <div class="ms-Dialog-content">
+                    <div class="ms-TextField">
+                        <label class="ms-Label">Weight</label>
+                        <input class="ms-TextField-field" type="number" name="weight" placeholder="Your weight">
+                    </div>
+                    <div class="ms-TextField">
+                        <div class="ms-DatePicker">
+                            <div class="ms-TextField">
+                                <label class="ms-Label">Date</label>
+                                <i class="ms-DatePicker-event ms-Icon ms-Icon--Event"></i>
+                                <input class="ms-TextField-field" type="text" name="datepick" placeholder="Select a date&hellip;">
+                            </div>
+                            <div class="ms-DatePicker-monthComponents">
+                                <span class="ms-DatePicker-nextMonth js-nextMonth">
+                                    <i class="ms-Icon ms-Icon--ChevronRight"></i>
+                                </span>
+                                <span class="ms-DatePicker-prevMonth js-prevMonth">
+                                    <i class="ms-Icon ms-Icon--ChevronLeft"></i>
+                                </span>
+                                <div class="ms-DatePicker-headerToggleView js-showMonthPicker"></div>
+                            </div>
+                            <span class="ms-DatePicker-goToday js-goToday">Go to today</span>
+                            <div class="ms-DatePicker-monthPicker">
+                                <div class="ms-DatePicker-header">
+                                    <div class="ms-DatePicker-yearComponents">
+                                        <span class="ms-DatePicker-nextYear js-nextYear">
+                                            <i class="ms-Icon ms-Icon--ChevronRight"></i>
+                                        </span>
+                                        <span class="ms-DatePicker-prevYear js-prevYear">
+                                            <i class="ms-Icon ms-Icon--ChevronLeft"></i>
+                                        </span>
+                                    </div>
+                                    <div class="ms-DatePicker-currentYear js-showYearPicker"></div>
+                                </div>
+                                <div class="ms-DatePicker-optionGrid">
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="0">Jan</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="1">Feb</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="2">Mar</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="3">Apr</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="4">May</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="5">Jun</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="6">Jul</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="7">Aug</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="8">Sep</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="9">Oct</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="10">Nov</span>
+                                    <span class="ms-DatePicker-monthOption js-changeDate" data-month="11">Dec</span>
+                                </div>
+                            </div>
+                            <div class="ms-DatePicker-yearPicker">
+                                <div class="ms-DatePicker-decadeComponents">
+                                    <span class="ms-DatePicker-nextDecade js-nextDecade">
+                                        <i class="ms-Icon ms-Icon--ChevronRight"></i>
+                                    </span>
+                                    <span class="ms-DatePicker-prevDecade js-prevDecade">
+                                        <i class="ms-Icon ms-Icon--ChevronLeft"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ms-Dialog-actions">
+                    <button class="ms-Button ms-Dialog-action ms-Button--primary" type="submit">
+                        <span class="ms-Button-label">Register</span>
+                    </button>
+            </form>
+            </div>
+            <label class="docs-DialogExample-label"></label>
+        </div>
+        <script type="text/javascript">
+            var PeoplePickerElements = document.querySelectorAll(".ms-PeoplePicker");
+            for (var i = 0; i < PeoplePickerElements.length; i++) {
+                new fabric['PeoplePicker'](PeoplePickerElements[i]);
+            }
+        </script>
+        <script type="text/javascript">
+            // trace 1
+            const weights = {{{ json weights }}};
+            const newWeights = [];
+            const newDate = [];
+
+            // trace 2
+            const activities = {{{ json acts }}};
+            const descs = [];
+            const begins = [];
+            const durations = [];
+            const ends = [];
+            const dates = [];
+
+            for (let i = 0; i < weights.length; i++) {
+                newWeights.push(weights[i].weight);
+                newDate.push(weights[i].date);
+            }
+            for (let i = 0; i < activities.length; i++) {
+                descs.push(activities[i].desc);
+                begins.push(activities[i].begintime);
+                const duration = new Date(activities[i].date + " " + activities[i].end) - new Date(activities[i].date + " " + activities[i].start);
+                durations.push(duration / 3600000 * 60);
+                ends.push(activities[i].endtime);
+                dates.push(`${activities[i].date} (${activities[i].start} => ${activities[i].end})`);
+            }
+            const trace1 = {
+                x: newDate,
+                y: newWeights,
+                type: 'scatter',
+                name: 'Weight'
+            };
+            const trace2 = {
+                x: dates,
+                y: durations,
+                type: 'bar',
+                name: 'activity duration over time'
+            };
+            Plotly.newPlot('myActivities', [trace2], {title: "Activities duration over time ascending"});
+            Plotly.newPlot('myWeights', [trace1], {title: "Evolution of weight over time ascending"});
+        </script>
+        <script type="text/javascript">
+            var ButtonElements = document.querySelectorAll(".ms-Button");
+            for (var i = 0; i < ButtonElements.length; i++) {
+                new fabric['Button'](ButtonElements[i], function () {
+                });
+            }
+        </script>
+        <script type="text/javascript">
+            (function () {
+                var signIn = document.querySelector(".dialogSignIn");
+                var signInButton = document.querySelector(".dialogSignInButton");
+                var dialogSignIn = signIn.querySelector(".dialogSignInDial");
+                var labelSignIn = signIn.querySelector(".docs-DialogExample-label")
+
+                var actionButtonElementsSignIn = signIn.querySelectorAll(".ms-Dialog-action");
+                var actionButtonComponentsSignIn = [];
+
+                // Wire up the dialog
+                var dialogComponentSignIn = new fabric['Dialog'](dialogSignIn);
+                // Wire up the buttons
+                for (var i = 0; i < actionButtonElementsSignIn.length; i++) {
+                    actionButtonComponentsSignIn[i] = new fabric['Button'](actionButtonElementsSignIn[i], actionHandler);
+                }
+                // When clicking the button, open the dialog
+                signInButton.onclick = function () {
+                    openDialog(dialogSignIn);
+                };
+                function actionHandler(event) {
+                    labelSignIn.innerText = this.innerText.trim() + " clicked";
+                }
+                function openDialog(dialog) {
+                    // Open the dialog
+                    dialogComponentSignIn.open();
+                }
+            }());</script>
+        <!-- Log In Stuff-->
+        <script type="text/javascript">
+            (function () {
+                var logIn = document.querySelector(".dialogLogIn");
+                var logInButton = document.querySelector(".dialogLogInButton");
+                var dialogLogIn = logIn.querySelector(".dialogLogInDial");
+                var labelLogIn = logIn.querySelector(".docs-DialogExample-label")
+
+                var actionButtonElementsLogIn = logIn.querySelectorAll(".ms-Dialog-action");
+                var actionButtonComponentsLogIn = [];
+
+                // Wire up the dialog
+                var dialogComponentLogIn = new fabric['Dialog'](dialogLogIn);
+                // Wire up the buttons
+                for (var i = 0; i < actionButtonElementsLogIn.length; i++) {
+                    actionButtonComponentsLogIn[i] = new fabric['Button'](actionButtonElementsLogIn[i], actionHandler);
+                }
+                // When clicking the button, open the dialog
+                logInButton.onclick = function () {
+                    openDialog(dialogLogIn);
+                };
+                function actionHandler(event) {
+                    labelLogIn.innerText = this.innerText.trim() + " clicked";
+                }
+                function openDialog(dialog) {
+                    // Open the dialog
+                    dialogComponentLogIn.open();
+                }
+
+            }());</script>
+        <script type="text/javascript">
+            var DatePickerElements = document.querySelectorAll(".ms-DatePicker");
+            for (var i = 0; i < DatePickerElements.length; i++) {
+                new fabric['DatePicker'](DatePickerElements[i]);
+            }
+        </script>
+        <script type="text/javascript">
+            $('.clockpicker').clockpicker();
+        </script>
+</body>
+
+</html>
