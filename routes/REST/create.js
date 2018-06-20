@@ -8,7 +8,7 @@
 
 import express from "express";
 import bcrypt from "bcrypt";
-import { db, openDb } from "../db/database.js";
+import { db, openDb } from "../../db/database.js";
 
 const create = express.Router();
 

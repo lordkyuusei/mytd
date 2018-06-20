@@ -8,7 +8,7 @@
 
 import express from "express";
 import bcrypt from "bcrypt";
-import { db, openDb, closeDb } from "../db/database.js";
+import { db, openDb, closeDb } from "../db/database";
 
 const login = express.Router();
 

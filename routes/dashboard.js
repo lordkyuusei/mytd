@@ -7,7 +7,7 @@
 ***************************************/
 
 import express from "express";
-import { db } from "../db/database.js";
+import { db } from "../db/database";
 
 const dashboard = express.Router();
 dashboard.get("/dashboard", (req, res) => {

@@ -5,10 +5,8 @@
 ** index.js
 ** 2018 - All rights reserved
 ***************************************/
-import sqlite3 from "sqlite3";
 import express from "express";
 import jwt from "jsonwebtoken";
-import { db } from "../../db/database.js";
 
 const dashboard = express.Router();
 dashboard.get("/dashboard", (req, res) => {
