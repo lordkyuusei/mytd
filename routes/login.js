@@ -7,39 +7,39 @@
 ***************************************/
 
 import express from "express";
-import sqlite3 from "sqlite3";
-import sessHandle, { setSession } from "../index";
 import bcrypt from "bcrypt";
+import { db, openDb, closeDb } from "../db/database.js";
 
 const login = express.Router();
-login.post("/login", (req, res) => {
-	if (sessHandle.username)
-		res.redirect("/");
-	const { username, password } = req.body;
-	const db = new sqlite3.Database("./db/mytd.db");
 
-	// We check if the username is not already used, since we will use it as a unique identifier.
-	db.get("SELECT username, password FROM accounts WHERE username = ?", username, (err, account) => {
+login.post("/login", (req, res) => {
+	const { username, password } = req.body;
+	if (req.session.userId)
+		res.redirect("/");
+	
+	if (db === undefined) {
+		openDb();
+	}
+//	const db = new sqlite3.Database("./db/mytd.db");
+
+	db.get("SELECT id, username, password FROM accounts WHERE username = ?", username, (err, account) => {
 		const isExisting = account !== undefined;
 		const isMatching = isExisting && bcrypt.compareSync(password, account.password);
-		const toRender = isExisting ? (
-			isMatching ? "dashboard" : "?reason=unmatch"
-		) : "?reason=nonexistent";
+		const toRender = isExisting ? (isMatching ? "dashboard" : "?reason=unmatch") : "?reason=nonexistent";
 
-		setSession(req.session);
-		sessHandle.username = isMatching ? username : undefined;
+		req.session.userId = isMatching ? account.id : undefined;
+		req.session.username = isMatching ? account.username : undefined;
 		res.redirect(`/${toRender}`);
 	});
 });
 
 login.post("/signout", (req, res) => {
-	setSession(req.session);
-	const toRender = sessHandle.username === undefined ? "/?reason=login" : "/";
-	const doRender = sessHandle.username !== undefined;
+	const toRender = req.session.username === undefined ? "/?reason=login" : "/";
+	const doRender = req.session.username !== undefined;
 
 	doRender ? req.session.destroy(() => {
-		sessHandle.username = undefined;
 		res.redirect(toRender);
+		closeDb();
 	}) : res.redirect(toRender);
 });
 export default login;

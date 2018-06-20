@@ -54,7 +54,7 @@
                     Users
                 </div>
                 {{#each accs}}
-                <a href="/dashboard?people={{username}}">
+                <a href="/dashboard?people={{id}}">
                     <div class="ms-PeoplePicker-result" tabindex="1">
                         <div class="ms-Persona ms-Persona--sm">
                             <div class="ms-Persona-imageArea">
@@ -63,8 +63,8 @@
                             <div class="ms-Persona-presence">
                             </div>
                             <div class="ms-Persona-details">
-                                <div class="ms-Persona-primaryText">{{username}}</div>
-                                <div class="ms-Persona-secondaryText">{{city}}</div>
+                                <div class="ms-Persona-primaryText">{{username}}, <i>{{city}}</i></div>
+                                <div class="ms-Persona-secondaryText">{{born}}</div>
                             </div>
                         </div>
                         <button class="ms-PeoplePicker-resultAction">
@@ -262,6 +262,9 @@
             const durations = [];
             const ends = [];
             const dates = [];
+
+            console.info("weights: ", weights);
+            console.info("activities: ", activities)
 
             for (let i = 0; i < weights.length; i++) {
                 newWeights.push(weights[i].weight);

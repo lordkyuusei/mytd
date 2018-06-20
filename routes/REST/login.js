@@ -20,11 +20,9 @@ login.post("/login", (req, res) => {
 	db.get("SELECT username, password FROM accounts WHERE username = ?", username, (err, account) => {
 		const isExisting = account !== undefined;
 		const isMatching = isExisting && bcrypt.compareSync(password, account.password);
-		const toRender = isExisting ? (
-			isMatching ? "200" : "400"
-		) : "400";
+		const toRender = isExisting ? (isMatching ? "200" : "400") : "400";
 
-		const accessToken = isMatching ? jwt.sign({ id: account.id }, "superawesomekey") : undefined;
+		const accessToken = isMatching ? jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), id: account.id }, "superawesomekey") : undefined;
 		const bearer = isMatching ? "Bearer" : undefined;
 		const idToken = isMatching ? jwt.sign({ sub: account.id, preferred_username: account.username} , "superawesomekey") : undefined;
 		const toSend = isMatching ? { accessToken, bearer, idToken } : "Bad request: Invalid credentials";
@@ -33,7 +31,4 @@ login.post("/login", (req, res) => {
 	});
 });
 
-login.post("/signout", (req, res) => {
-	res.redirect("/");
-});
 export default login;

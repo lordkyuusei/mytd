@@ -27,8 +27,8 @@ import dashboardrest from "./routes/REST/dashboard";
 /* database */
 const db = new sqlite3.Database("./db/mytd.db");
 db.run("CREATE TABLE IF NOT EXISTS accounts(id INTEGER,username STRING,password STRING,born STRING,city STRING, PRIMARY KEY (id));");
-db.run("CREATE TABLE IF NOT EXISTS activities(id INTEGER,username STRING,date STRING, ddate STRING, start STRING,end STRING,desc STRING, PRIMARY KEY (id));");
-db.run("CREATE TABLE IF NOT EXISTS weights(id INTEGER,username STRING,date STRING,ddate STRING,weight INTEGER, PRIMARY KEY (id));");
+db.run("CREATE TABLE IF NOT EXISTS activities(id INTEGER,userid INTEGER,date STRING, ddate STRING, start STRING,end STRING,desc STRING, PRIMARY KEY (id));");
+db.run("CREATE TABLE IF NOT EXISTS weights(id INTEGER,userid INTEGER,date STRING,ddate STRING,weight INTEGER, PRIMARY KEY (id));");
 db.close();
 
 /* config */
@@ -40,7 +40,12 @@ app.use(logger("dev"));
 app.use(bodyParser.json());  
 app.use(bodyParser.urlencoded({ extended: false }));  
 app.use(express.static(path.join(__dirname, "public")));  
-app.use(session({ secret: "d14m4nt68*" }));
+app.use(session({ 
+	secret: "d14m4nt68*",
+	resave: true,
+	saveUninitialized: true,
+	cookie: { secure: false }
+}));
 
 app.use("/", create);
 app.use("/", login);
@@ -51,18 +56,10 @@ app.use("/api", loginrest);
 app.use("/api", indexrest);
 app.use("/api", dashboardrest);
 
-let sessHandle = [];
-const setSession = (session) => {
-	sessHandle = session;
-};
-
 Handlebars.registerHelper("json", (context) => {
 	return JSON.stringify(context);
 });
 
 app.listen("3000", () => {
-	console.log("Listening on port");
+	console.log("Running on localhost:3000");
 });
-
-export { setSession };
-export default sessHandle;

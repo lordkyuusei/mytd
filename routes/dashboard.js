@@ -5,51 +5,44 @@
 ** index.js
 ** 2018 - All rights reserved
 ***************************************/
-import sqlite3 from "sqlite3";
+
 import express from "express";
-import sessHandle, { setSession } from "../index";
+import { db } from "../db/database.js";
 
 const dashboard = express.Router();
-dashboard.get("/dashboard", (req, res, err) => {
-	setSession(req.session);
-	const toRender = sessHandle.username === undefined ? "/?reason=login" : "dashboard.hbs";
-	const doRender = sessHandle.username !== undefined;
-	const whoRender = req.query.people !== undefined ? req.query.people : sessHandle.username;
-	const db = doRender ? new sqlite3.Database("./db/mytd.db") : undefined;
+dashboard.get("/dashboard", (req, res) => {
+	const doRender = req.session.userId !== undefined;
+	const toRender = doRender ? "dashboard.hbs" : "/?reason=login";
+	const whoRender = req.query.people !== undefined ? req.query.people : req.session.userId;
 
-	db !== undefined ? db.all("SELECT username, city FROM accounts", (err, allAccounts) => {
-		db.close();
-		const dbActivities = new sqlite3.Database("./db/mytd.db");
+	db !== undefined ? db.all("SELECT id, username, born, city FROM accounts", (err, allAccounts) => {
+		db.all("SELECT * FROM activities WHERE userid = ? ORDER BY date(ddate) ASC", whoRender, (err, activities) => {
+			db.all("SELECT * FROM weights WHERE userid = ? ORDER BY date(ddate) ASC", whoRender, (err, weights) => {
 
-		dbActivities.all("SELECT * FROM activities WHERE username = ? ORDER BY date(ddate) ASC", whoRender, (err, activities) => {
-			dbActivities.close();
+				// Empty objects > undefined objects
+				weights = weights === undefined || weights == null ? {} : weights;
+				activities = activities === undefined || activities == null ? {} : activities;
 
-			const dbWeights = new sqlite3.Database("./db/mytd.db");
-			dbWeights.all("SELECT * FROM weights WHERE username = ? ORDER BY date(ddate) ASC", whoRender, (err, weights) => {
-				dbWeights.close();
 				res.render(toRender, { accs: allAccounts, acts: activities, weights: weights });
 			});
 		});
 	}) : res.redirect(toRender);
 });
 
-dashboard.post("/dashboard", (req, res, err) => {
-	setSession(req.session);
-	const toRender = sessHandle.username === undefined ? "/?reason=login" : "dashboard.hbs";
-	const doRender = sessHandle.username !== undefined;
-	const toParse = req.body;
-	const data = toParse.weight === undefined ? "activities" : "weights";
-	const marks = toParse.weight === undefined ? "NULL,?,?,?,?,?,?" : "NULL,?,?,?,?";
-	const query = toParse.weight === undefined ?
-		[ sessHandle.username, toParse.datepick, new Date(toParse.datepick), toParse.begintime, toParse.endtime, toParse.desc ] : 
-		[ sessHandle.username, toParse.datepick, new Date(toParse.datepick), toParse.weight ];
+dashboard.post("/dashboard", (req, res) => {
+	const doRender = req.session.userId !== undefined;
+	const toRender = doRender ? "/dashboard" : "/?reason=login";
 
-	const db = doRender ? new sqlite3.Database("./db/mytd.db") : undefined;
+	// We only build one endpoint for the queries, since they are very similar and can be simplified by only a few lines of ternary code instead of two endpoints and code duplication.
+	const data = req.body.weight === undefined ? "activities" : "weights";
+	const marks = req.body.weight === undefined ? "NULL,?,?,?,?,?,?" : "NULL,?,?,?,?";
+	const query = req.body.weight === undefined ?
+		[ req.session.userId, req.body.datepick.replace(",", ""), new Date(req.body.datepick), req.body.begintime, req.body.endtime, req.body.desc ] : 
+		[ req.session.userId, req.body.datepick.replace(",", ""), new Date(req.body.datepick), req.body.weight ];
+
 	db !== undefined ? db.run(`INSERT INTO ${data} VALUES(${marks})`, query, () => {
-		db.close();
-		res.redirect("/dashboard");
+		res.redirect(toRender);
 	}) : res.redirect(toRender);
-
 });
 
 export default dashboard;
