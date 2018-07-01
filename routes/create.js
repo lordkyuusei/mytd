@@ -21,16 +21,20 @@ create.post("/create", (req, res) => {
 		const pass = account === undefined;
 		const error = pass ? "" : "alreadyused";
 
-		pass ? bcrypt.hash(password, 10, (err, hash) => {
-			db.run("INSERT INTO accounts VALUES(NULL,?,?,?,?)", username, hash, datepick, city);
-			db.get("SELECT id from accounts WHERE username = ?", username, (err, accountNbr) => {
-				req.session.userId = accountNbr.id === undefined ? accountNbr : accountNbr.id;
-				req.session.username = username;
-				req.session.save(() => {
-					res.redirect("/dashboard");
+		if (pass) {
+			bcrypt.hash(password, 10, (err, hash) => {
+				db.run("INSERT INTO accounts VALUES(NULL,?,?,?,?)", username, hash, datepick, city);
+				db.get("SELECT id from accounts WHERE username = ?", username, (err, accountNbr) => {
+					req.session.userId = accountNbr.id === undefined ? accountNbr : accountNbr.id;
+					req.session.username = username;
+					req.session.save(() => {
+						res.redirect("/dashboard");
+					});
 				});
 			});
-		}) : res.redirect(`/?reason=${error}`);
+		}
+		else
+			res.redirect(`/?reason=${error}`);
 	});
 });
 

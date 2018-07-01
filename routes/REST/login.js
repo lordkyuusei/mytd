@@ -17,7 +17,8 @@ login.post("/login", (req, res) => {
 	const db = new sqlite3.Database("./db/mytd.db");
 
 	// We check if the username is not already used, since we will use it as a unique identifier.
-	db.get("SELECT username, password FROM accounts WHERE username = ?", username, (err, account) => {
+	db.get("SELECT id, username, password FROM accounts WHERE username = ?", username, (err, account) => {
+		db.close();
 		const isExisting = account !== undefined;
 		const isMatching = isExisting && bcrypt.compareSync(password, account.password);
 		const toRender = isExisting ? (isMatching ? "200" : "400") : "400";

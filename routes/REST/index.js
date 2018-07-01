@@ -7,13 +7,11 @@
 ***************************************/
 
 import express from "express";
-import sessHandle, { setSession } from "../index";
-
 const routes = express.Router();
 
 routes.get("/", (req, res) => {
 	// No useful information for smart devices here.
-	res.status("200").send("Please go to /login to login.");
+	res.status("200").send("Please send a request to /api/login to login.");
 });
 
 export default routes;

@@ -1,0 +1,3 @@
+#! /bin/bash
+TOKENS=$(curl -s --header "Content-Type: application/json" --request POST --data '{"username": "LordKyuusei", 
+"password": "diamant"}' http://localhost:3000/api/login)

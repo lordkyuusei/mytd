@@ -15,18 +15,22 @@ dashboard.get("/dashboard", (req, res) => {
 	const toRender = doRender ? "dashboard.hbs" : "/?reason=login";
 	const whoRender = req.query.people !== undefined ? req.query.people : req.session.userId;
 
-	db !== undefined ? db.all("SELECT id, username, born, city FROM accounts", (err, allAccounts) => {
-		db.all("SELECT * FROM activities WHERE userid = ? ORDER BY date(ddate) ASC", whoRender, (err, activities) => {
-			db.all("SELECT * FROM weights WHERE userid = ? ORDER BY date(ddate) ASC", whoRender, (err, weights) => {
-
-				// Empty objects > undefined objects
-				weights = weights === undefined || weights == null ? {} : weights;
-				activities = activities === undefined || activities == null ? {} : activities;
-
-				res.render(toRender, { accs: allAccounts, acts: activities, weights: weights });
+	if (db !== undefined) {
+		db.all("SELECT id, username, born, city FROM accounts", (err, allAccounts) => {
+			db.all("SELECT * FROM activities WHERE userid = ? ORDER BY date(ddate) ASC", whoRender, (err, activities) => {
+				db.all("SELECT * FROM weights WHERE userid = ? ORDER BY date(ddate) ASC", whoRender, (err, weights) => {
+	
+					// Empty objects > undefined objects
+					weights = weights === undefined || weights == null ? {} : weights;
+					activities = activities === undefined || activities == null ? {} : activities;
+	
+					res.render(toRender, { accs: allAccounts, acts: activities, weights: weights });
+				});
 			});
 		});
-	}) : res.redirect(toRender);
+	}
+	else
+		res.redirect(toRender);
 });
 
 dashboard.post("/dashboard", (req, res) => {
@@ -40,9 +44,13 @@ dashboard.post("/dashboard", (req, res) => {
 		[ req.session.userId, req.body.datepick.replace(",", ""), new Date(req.body.datepick), req.body.begintime, req.body.endtime, req.body.desc ] : 
 		[ req.session.userId, req.body.datepick.replace(",", ""), new Date(req.body.datepick), req.body.weight ];
 
-	db !== undefined ? db.run(`INSERT INTO ${data} VALUES(${marks})`, query, () => {
+	if (db !== undefined) {
+		db.run(`INSERT INTO ${data} VALUES(${marks})`, query, () => {
+			res.redirect(toRender);
+		});
+	}
+	else 
 		res.redirect(toRender);
-	}) : res.redirect(toRender);
 });
 
 export default dashboard;

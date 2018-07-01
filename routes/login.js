@@ -20,7 +20,6 @@ login.post("/login", (req, res) => {
 	if (db === undefined) {
 		openDb();
 	}
-//	const db = new sqlite3.Database("./db/mytd.db");
 
 	db.get("SELECT id, username, password FROM accounts WHERE username = ?", username, (err, account) => {
 		const isExisting = account !== undefined;
@@ -37,9 +36,13 @@ login.post("/signout", (req, res) => {
 	const toRender = req.session.username === undefined ? "/?reason=login" : "/";
 	const doRender = req.session.username !== undefined;
 
-	doRender ? req.session.destroy(() => {
+	if (doRender) {
+		req.session.destroy(() => {
+			res.redirect(toRender);
+			closeDb();
+		});
+	}
+	else
 		res.redirect(toRender);
-		closeDb();
-	}) : res.redirect(toRender);
 });
 export default login;
