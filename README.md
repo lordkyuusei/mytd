@@ -15,9 +15,14 @@ d) Allows a registered user to see other's progression.
 ### Misc
 1. A REST API is available with this project. You can currently create a new account, log-in with a single token authentication, and get your own datas.
 2. A lot of ternary expressions are used, since an expression is better in term of performance vs if/else segments + we are now in 2018 and functionnal programming should be a thing now, expressions & assignations > iterations & mutables variables.
-3. Two types of resources are created through the same endpoint because of the simplicity of the request. Both are simplifiable with ternary operations, and only ask for a couple of code's line without being hard to understand.
+3. Two types of resources are created through the same endpoint because of the simplicity of the request. Both are simplifiable with ternary operations, and only ask for a couple of lines without it being hard to understand.
 4. 
 ## Patch Notes
+
+1.3
+ - Modified several ternary expressions by replacing them with if/else statements.
+ - Added /api/create, /api/dashboard as endpoints.
+  o You can now login, create and account, access your data and add new resources through the RESTful API via smart devices.
 
 1.1
  - Fixed circular dependency between index & routes files.
